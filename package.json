@@ -1,7 +1,7 @@
 {
   "name": "com.gloryday.extended-debug-log",
   "displayName": "Extended Debug Log",
-  "version": "v1.0.0",
+  "version": "v1.1.0",
   "description": "This is a logging feature that offers greater convenience than the existing Debug.Log format.",
   "author": {
     "name": "Glory Day",
