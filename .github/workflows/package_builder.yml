@@ -31,12 +31,12 @@ jobs:
 
       - name: Back up assets
         run: |
-          mkdir -p /tmp/package
+          mkdir -p /Tmp
           if [ -d "Assets/Runtime" ]; then
-            cp -R Assets/Runtime Tmp/Runtime
+            cp -R Assets/Runtime /Tmp/Runtime
           fi
           if [ -d "Assets/Editor" ]; then
-            cp -R Assets/Editor Tmp/Editor
+            cp -R Assets/Editor /Tmp/Editor
           fi
 
       - name: Switch to master branch
@@ -47,7 +47,7 @@ jobs:
 
       - name: Restore assets into master branch
         run: |
-          cp -R Tmp/* .
+          cp -R /Tmp/* .
 
       - name: Determine version
         id: bump
