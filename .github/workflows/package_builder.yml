@@ -50,7 +50,10 @@ jobs:
       - name: Restore assets into master branch
         run: |
           cp -R ${{ runner.temp }}/package/Runtime Runtime
-          cp -R ${{ runner.temp }}/package/Editor Editor
+          
+          if [ -d "${{ runner.temp }}/package/Editor" ]; then
+            cp -R ${{ runner.temp }}/package/Editor Editor
+          fi
 
       - name: Determine version
         id: bump
