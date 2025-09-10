@@ -34,11 +34,11 @@ jobs:
           mkdir -p ${{ runner.temp }}/package
           if [ -d "Assets/Runtime" ]; then
             cp -R Assets/Runtime ${{ runner.temp }}/package/
-            cp Assets/Runtime.meta ${{ runner.temp }}/package/Runtime/Runtime.meta
+            cp Assets/Runtime.meta ${{ runner.temp }}/package/Runtime.meta
           fi
           if [ -d "Assets/Editor" ]; then
             cp -R Assets/Editor ${{ runner.temp }}/package/
-            cp Assets/Editor.meta ${{ runner.temp }}/package/Editor/Editor.meta
+            cp Assets/Editor.meta ${{ runner.temp }}/package/Editor.meta
           fi
 
       - name: Switch to master branch
@@ -49,11 +49,7 @@ jobs:
 
       - name: Restore assets into master branch
         run: |
-          cp -R ${{ runner.temp }}/package/Runtime Runtime
-          
-          if [ -d "${{ runner.temp }}/package/Editor" ]; then
-            cp -R ${{ runner.temp }}/package/Editor Editor
-          fi
+          cp -R ${{ runner.temp }}/package/* .
 
       - name: Determine version
         id: bump
