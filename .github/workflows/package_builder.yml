@@ -81,25 +81,6 @@ jobs:
           NEW_VERSION="v$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH"
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Clean master branch
-        run: |
-          shopt -s extglob
-          rm -rf !(Assets|README.md|package.json)
-
-      - name: Restructure directories
-        run: |
-          rm -rf Runtime Editor
-          
-          if [ -d "Assets/Runtime" ]; then
-            mv Assets/Runtime Runtime
-          fi
-          
-          if [ -d "Assets/Editor" ]; then
-            mv Assets/Editor Editor
-          fi
-          
-          rm -rf Assets
-
       - name: Update package.json version
         run: |
           NEW_VERSION=${{ steps.bump.outputs.new_version }}
@@ -132,7 +113,7 @@ jobs:
         run: |
           VERSION=${{ steps.bump.outputs.new_version }}
           if git rev-parse "$VERSION" >/dev/null 2>&1; then
-            echo "Tag $VERSION already exists. Skipping."
+            echo "Tag $VERSION already exists, skipping."
           else
             git tag "$VERSION"
             git push origin "$VERSION"
