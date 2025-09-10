@@ -12,12 +12,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout develop branch
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: develop
-      
       - name: Extract repository name
         id: repo
         run: |
@@ -28,11 +22,32 @@ jobs:
           echo "raw_repository_name=$RAW_REPOSITORY_NAME" >> $GITHUB_OUTPUT
           echo "normalized_repository_name=$NORMALIZED_REPOSITORY_NAME" >> $GITHUB_OUTPUT
           echo "display_name=$DISPLAY_NAME" >> $GITHUB_OUTPUT 
+    
+      - name: Checkout develop branch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: develop
 
-      - name: Checkout master branch
+      - name: Back up assets
         run: |
-          git fetch origin master
-          git checkout -B master origin/master
+          mkdir -p /tmp/package
+          if [ -d "Assets/Runtime" ]; then
+            cp -R Assets/Runtime /Tmp/Runtime
+          fi
+          if [ -d "Assets/Editor" ]; then
+            cp -R Assets/Editor /Tmp/Editor
+          fi
+
+      - name: Switch to master branch
+        run: |
+          git fetch origin master || true
+          git checkout -B master origin/master || git checkout -B master
+          rm -rf Runtime Editor
+
+      - name: Restore assets into master branch
+        run: |
+          cp -R /Tmp/* .
 
       - name: Determine version
         id: bump
