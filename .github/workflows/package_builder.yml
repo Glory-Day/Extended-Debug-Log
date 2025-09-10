@@ -1,0 +1,120 @@
+name: Build UPM Package
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout develop branch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Extract repository name
+        id: repo
+        run: |
+          RAW_REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)
+          NORMALIZED_REPOSITORY_NAME=$(echo "$RAW_REPOSITORY_NAME" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-')
+          DISPLAY_NAME=$(echo "$RAW_REPOSITORY_NAME" | sed -E 's/-/ /g' | sed -E "s/\b(.)/\u\1/g")
+
+          echo "raw_repository_name=$RAW_REPOSITORY_NAME" >> $GITHUB_OUTPUT
+          echo "normalized_repository_name=$NORMALIZED_REPOSITORY_NAME" >> $GITHUB_OUTPUT
+          echo "display_name=$DISPLAY_NAME" >> $GITHUB_OUTPUT 
+
+      - name: Checkout master branch
+        run: |
+          git fetch origin master --tags
+          git checkout master
+
+      - name: Determine version
+        id: bump
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
+          echo "Last tag: $LAST_TAG"
+
+          VERSION=${LAST_TAG#v}
+          MAJOR=$(echo $VERSION | cut -d. -f1)
+          MINOR=$(echo $VERSION | cut -d. -f2)
+          PATCH=$(echo $VERSION | cut -d. -f3)
+
+          MESSAGE=$(git log origin/develop -1 --pretty=%B)
+          echo "Commit message: $MESSAGE"
+
+          NEW_MAJOR=$MAJOR
+          NEW_MINOR=$MINOR
+          NEW_PATCH=$PATCH
+
+          if [[ $MESSAGE == *"BREAKING CHANGE"* ]] || [[ $MESSAGE == *!* ]]; then
+            NEW_MAJOR=$((MAJOR + 1))
+            NEW_MINOR=0
+            NEW_PATCH=0
+          elif [[ $MESSAGE == Feature:* ]]; then
+            NEW_MINOR=$((MINOR + 1))
+            NEW_PATCH=0
+          elif [[ $MESSAGE == Fix:* ]]; then
+            NEW_PATCH=$((PATCH + 1))
+          fi
+
+          NEW_VERSION="v$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Clean master branch
+        run: |
+          shopt -s extglob
+          rm -rf !(Assets|README.md|package.json)
+
+      - name: Restructure directories
+        run: |
+          rm -rf Runtime Editor
+          
+          if [ -d "Assets/Runtime" ]; then
+            mv Assets/Runtime ./Runtime
+          fi
+          
+          if [ -d "Assets/Editor" ]; then
+            mv Assets/Editor ./Editor
+          fi
+          
+          rm -rf Assets
+
+      - name: Update package.json version
+        run: |
+          NEW_VERSION=${{ steps.bump.outputs.new_version }}
+          if [ -f package.json ]; then
+            jq --arg v "$NEW_VERSION" '.version=$v' package.json > package.tmp.json
+            mv package.tmp.json package.json
+          else
+            jq -n \
+              --arg name "com.gloryday.${{ steps.repo.outputs.normalized_repository_name }}" \
+              --arg display "${{ steps.repo.outputs.display_name }}" \
+              --arg version "${{ steps.bump.outputs.new_version }}" \
+              '{
+                name: $name,
+                displayName: $display,
+                version: $version,
+                description: "This is a logging feature that offers greater convenience than the existing 'Debug.Log' format.",
+                author: { name: "Glory Day", email: "alwaysgloryday@gmail.com" }
+              }' > package.json
+          fi
+
+      - name: Commit and push to master branch
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "CI/CD: update UPM package to ${{ steps.tag.outputs.version }} from develop ($GITHUB_SHA)" || echo "No changes to commit"
+          git push origin master
+
+      - name: Tag new version
+        run: |
+          VERSION=${{ steps.bump.outputs.new_version }}
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            echo "Tag $VERSION already exists. Skipping."
+          else
+            git tag "$VERSION"
+            git push origin "$VERSION"
+          fi
