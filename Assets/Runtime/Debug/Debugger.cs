@@ -84,8 +84,7 @@ namespace GloryDay.Debug
         /// <param name="methodName"> Name of the method, property, or event from which the call originated </param>
         /// <param name="filePath"> Full path of the file which the call originated </param>
         [Conditional(UnityEditor), Conditional(DevelopmentBuild)]
-        public static void LogProgress([CallerMemberName] string methodName = "",
-                                       [CallerFilePath] string filePath = "")
+        public static void LogProgress([CallerMemberName] string methodName = "", [CallerFilePath] string filePath = "")
         {
             var className = Path.GetFileNameWithoutExtension(filePath);
 
@@ -111,9 +110,7 @@ namespace GloryDay.Debug
         /// <param name="methodName"> Name of the method, property, or event from which the call originated </param>
         /// <param name="filePath"> Full path of the file which the call originated </param>
         [Conditional(UnityEditor), Conditional(DevelopmentBuild)]
-        public static void LogAsAdministrator(string message,
-                                              [CallerMemberName] string methodName = "",
-                                              [CallerFilePath] string filePath = "")
+        public static void LogAsAdministrator(string message, [CallerMemberName] string methodName = "", [CallerFilePath] string filePath = "")
         {
             var className = Path.GetFileNameWithoutExtension(filePath);
 
@@ -138,9 +135,7 @@ namespace GloryDay.Debug
         /// <param name="methodName"> Name of the method, property, or event from which the call originated </param>
         /// <param name="filePath"> Full path of the file which the call originated </param>
         [Conditional(UnityEditor), Conditional(DevelopmentBuild)]
-        public static void LogMessage(string message,
-                                      [CallerMemberName] string methodName = "",
-                                      [CallerFilePath] string filePath = "")
+        public static void LogMessage(string message, [CallerMemberName] string methodName = "", [CallerFilePath] string filePath = "")
         {
             var className = Path.GetFileNameWithoutExtension(filePath);
 
@@ -165,9 +160,7 @@ namespace GloryDay.Debug
         /// <param name="methodName"> Name of the method, property, or event from which the call originated </param>
         /// <param name="filePath"> Full path of the file which the call originated </param>
         [Conditional(UnityEditor), Conditional(DevelopmentBuild)]
-        public static void LogError(string message,
-                                    [CallerMemberName] string methodName = "",
-                                    [CallerFilePath] string filePath = "")
+        public static void LogError(string message, [CallerMemberName] string methodName = "", [CallerFilePath] string filePath = "")
         {
             var className = Path.GetFileNameWithoutExtension(filePath);
 
@@ -192,9 +185,7 @@ namespace GloryDay.Debug
         /// <param name="methodName"> Name of the method, property, or event from which the call originated </param>
         /// <param name="filePath"> Full path of the file which the call originated </param>
         [Conditional(UnityEditor), Conditional(DevelopmentBuild)]
-        public static void LogSuccess(string message,
-                                      [CallerMemberName] string methodName = "",
-                                      [CallerFilePath] string filePath = "")
+        public static void LogSuccess(string message, [CallerMemberName] string methodName = "", [CallerFilePath] string filePath = "")
         {
             var className = Path.GetFileNameWithoutExtension(filePath);
 
