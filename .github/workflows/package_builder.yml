@@ -49,7 +49,6 @@ jobs:
 
       - name: Restore assets into master branch
         run: |
-          mkdir -p Runtime Editor
           cp -R ${{ runner.temp }}/package/Runtime Runtime
           cp -R ${{ runner.temp }}/package/Editor Editor
 
