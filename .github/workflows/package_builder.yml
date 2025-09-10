@@ -76,11 +76,11 @@ jobs:
           rm -rf Runtime Editor
           
           if [ -d "Assets/Runtime" ]; then
-            mv Assets/Runtime ./Runtime
+            mv Assets/Runtime Runtime
           fi
           
           if [ -d "Assets/Editor" ]; then
-            mv Assets/Editor ./Editor
+            mv Assets/Editor Editor
           fi
           
           rm -rf Assets
